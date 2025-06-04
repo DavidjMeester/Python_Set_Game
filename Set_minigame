@@ -1,0 +1,31 @@
+set1 = [0,0,0,0]
+set2 = [1,1,1,1]
+set3 = [2,2,2,2]
+
+
+symbollist = ["⋄", "~", "◦"]
+colorlist = ["red", "green", "purple"]
+shadinglist = ["solid", "striped", "open"]
+
+class Set:
+    def __init__(self, number, symbol, color, shading):
+        self.number = number
+        self.symbol = symbollist[symbol]
+        self.color = colorlist[color]
+        self.shading = shadinglist[shading]
+
+    def __str__(self):
+        return f"{self.number} {self.symbol} {self.color} {self.shading}"
+
+
+
+def Isitset():
+    for i in range(3):
+        totalvalue = 0
+        totalvalue = int(totalvalue + set1[i] + set2[i] +set3[i])
+    if totalvalue % 3 == 0:
+        print("Set!")
+    else:
+        print("Cap Set")
+
+Isitset()
