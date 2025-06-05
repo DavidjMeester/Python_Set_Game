@@ -1,31 +1,46 @@
+import pygame
+from pygame.locals import *
+import sys
+
+pygame.init()
+
 set1 = [0,0,0,0]
-set2 = [1,1,1,1]
+set2 = [0,1,1,1]
 set3 = [2,2,2,2]
 
+DISPLAYSURF = pygame.display.set_mode((800, 500))
+FPS = pygame.time.Clock()
+FPS.tick(60)
 
-symbollist = ["⋄", "~", "◦"]
-colorlist = ["red", "green", "purple"]
-shadinglist = ["solid", "striped", "open"]
+while True:
+    
+    symbollist = ["diamond", "squiggle", "oval"]
+    colorlist = ["red", "green", "purple"]
+    shadinglist = ["filled", "shaded", "empty"]
 
-class Set:
-    def __init__(self, number, symbol, color, shading):
-        self.number = number
-        self.symbol = symbollist[symbol]
-        self.color = colorlist[color]
-        self.shading = shadinglist[shading]
+    class Set:
+        def __init__(self, number, symbol, color, shading):
+            self.number = number + 1
+            self.symbol = symbollist[symbol]
+            self.color = colorlist[color]
+            self.shading = shadinglist[shading]
 
-    def __str__(self):
-        return f"{self.number} {self.symbol} {self.color} {self.shading}"
+        def __str__(self):
+            return f"{self.color}{self.symbol}{self.shading}{self.number}"
+
+    example = Set(0,1,0,2)
+    print(example)
 
 
+    def Isitset():
+        for _ in range(4):
+            totalvalue = int(set1[_] + set2[_] +set3[_])
+            print(totalvalue)
+        if totalvalue % 3 == 0:
+            print("Set!")
+        else:
+            print("Cap Set")
 
-def Isitset():
-    for i in range(3):
-        totalvalue = 0
-        totalvalue = int(totalvalue + set1[i] + set2[i] +set3[i])
-    if totalvalue % 3 == 0:
-        print("Set!")
-    else:
-        print("Cap Set")
+    Isitset()
 
-Isitset()
+pygame.display.update()
