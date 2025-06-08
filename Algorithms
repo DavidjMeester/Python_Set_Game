@@ -1,0 +1,30 @@
+def is_set(card1,card2,card3):
+        for x in range(4):
+            totalvalue = int(card1[x] + card2[x] + card3[x])
+            if totalvalue % 3 != 0:
+                return False
+        return True
+
+def find_one_set(cards):
+    cards_set = set(cards) #sneller
+    def missing_card(c1, c2):
+        return tuple((- (c1[x] + c2[x]) % 3) for x in range(4))
+    for i in range(len(cards)):
+        for x in range(i + 1, len(cards)):
+            m = missing_card(cards[i], cards[x])
+            if m in cards_set:
+                return (cards[i], cards[x], m)
+    return None
+
+def find_all_sets(cards):
+    cards_set = set(cards) #sneller
+    sets = set()
+    def missing_card(c1, c2):
+        return tuple((- (c1[x] + c2[x]) % 3) for x in range(4))
+    for i in range(len(cards)):
+        for x in range(i + 1, len(cards)):
+            m = missing_card(cards[i], cards[x])
+            if m in cards_set:
+                s_e_t = tuple(sorted((cards[i],cards[x],m)))
+                sets.add(s_e_t) #om duplicates te voorkomen
+    return list(sets)
