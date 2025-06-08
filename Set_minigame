@@ -1,12 +1,13 @@
 import pygame
 from pygame.locals import *
 import sys
+import math
 
 pygame.init()
 
-set1 = [0,0,0,0]
-set2 = [0,1,1,1]
-set3 = [2,2,2,2]
+card1 = [0,0,0,0]
+card2 = [0,1,1,1]
+card3 = [2,2,2,2]
 
 DISPLAYSURF = pygame.display.set_mode((800, 500))
 FPS = pygame.time.Clock()
@@ -32,15 +33,13 @@ while True:
     print(example)
 
 
-    def Isitset():
-        for _ in range(4):
-            totalvalue = int(set1[_] + set2[_] +set3[_])
-            print(totalvalue)
-        if totalvalue % 3 == 0:
-            print("Set!")
-        else:
-            print("Cap Set")
+    def is_set():
+        for x in range(4):
+            totalvalue = int(card1[x] + card2[x] + card3[x])
+            if totalvalue % 3 != 0:
+                return "Cap Set"
+        return "Set!"
 
-    Isitset()
+    print(is_set())
 
 pygame.display.update()
