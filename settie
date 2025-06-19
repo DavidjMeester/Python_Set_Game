@@ -2,6 +2,7 @@ import os
 import random
 import pygame
 
+#De eigenschappen opsplitsen
 class Set:
     colors = ['red', 'green', 'purple']
     symbols = ['oval', 'squiggle', 'diamond']
@@ -13,33 +14,35 @@ class Set:
         self.features = self.parse_name_to_features(self.name)
 
     def parse_name_to_features(self, name):
-        #Find color
+        #Vind color
         color = next(i for i, c in enumerate(self.colors) if c in name)
-        #Find symbol
+        #Vind symbol
         symbol = next(i for i, s in enumerate(self.symbols) if s in name)
-        #Find shading
+        #Vind shading
         shading = next(i for i, sh in enumerate(self.shadings) if sh in name)
-        #Find number
+        #Vind number
         number_char = name[-1]
         number = int(number_char) - 1
         return [color, symbol, shading, number]
 
     def __repr__(self):
         return str(self.features)  
+    #Hij geeft hier niet de goeie vectoren aan, soms wel, soms niet
 
+#even wat definities
 kaart_pad = "kaarten"
-
 alle_gif_kaarten = [f for f in os.listdir(kaart_pad) if f.endswith(".gif")]
 bestandsnaam = alle_gif_kaarten[0]
 setkaart = Set(bestandsnaam.replace(".gif", ""))
 
-
-def is_set(card1,card2,card3): #input: tuples
+#Functie definiëren voor wanneer het wel een set is per value van die klasse dus voor 4 keer
+def is_set(card1,card2,card3): 
         for x in range(4):
             totalvalue = int(card1[x] + card2[x] + card3[x])
             if totalvalue % 3 != 0:
                 return False
         return True
+
 
 def find_one_set(cards): #input: tuple met tuples
     cards_set = set(cards) #sneller
