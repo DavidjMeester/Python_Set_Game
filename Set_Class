@@ -1,7 +1,7 @@
 class Set:
     colors = ['red', 'green', 'purple']
     symbols = ['oval', 'squiggle', 'diamond']
-    shadings = ['solid', 'striped', 'empty']
+    shadings = ['filled', 'shaded', 'empty']
     numbers = ['1', '2', '3']
 
     def __init__(self, name):
