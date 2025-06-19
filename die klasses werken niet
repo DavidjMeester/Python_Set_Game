@@ -1,0 +1,59 @@
+import pygame
+import os
+import random
+
+class Set:
+    colors = ['red', 'green', 'purple']
+    symbols = ['oval', 'squiggle', 'diamond']
+    shadings = ['filled', 'shaded', 'empty']
+    numbers = ['1', '2', '3']
+
+    def __init__(self, name):
+        self.name = name.lower()
+        self.features = self.parse_name_to_features(self.name)
+
+    def parse_name_to_features(self, name):
+        #Find color
+        color = next(i for i, c in enumerate(self.colors) if c in name)
+        #Find symbol
+        symbol = next(i for i, s in enumerate(self.symbols) if s in name)
+        #Find shading
+        shading = next(i for i, sh in enumerate(self.shadings) if sh in name)
+        #Find number
+        number_char = name[-1]
+        number = int(number_char) - 1
+        return [color, symbol, shading, number]
+
+    def __repr__(self):
+        return str(self.features)    
+    
+
+pygame.init()
+screen = pygame.display.set_mode((1080, 720))
+clock = pygame.time.Clock()
+running = True
+
+# 1. Lees alle .gif bestanden in de map
+kaart_pad = "kaarten"
+alle_gif_kaarten = [f for f in os.listdir(kaart_pad) if f.endswith(".gif")]
+bestandsnaam = alle_gif_kaarten[0]
+# 2. Kies willekeurig 12 kaarten
+gekozen_kaarten = random.sample(alle_gif_kaarten, 12)
+setkaart = Set(bestandsnaam.replace(".gif", ""))
+# 3. Laad kaarten met posities en selectie-status
+kaarten = []
+for i, bestandsnaam in enumerate(gekozen_kaarten):
+    pad = os.path.join(kaart_pad, bestandsnaam)
+    afbeelding = pygame.image.load(pad)
+    
+    x = 50 + (i % 4) * 150
+    y = 50 + (i // 4) * 215
+    rect = pygame.Rect(x, y, 100, 200)
+    kaarten.append({
+        "image": afbeelding,
+        "rect": rect,
+        "selected": False,
+        "set": setkaart
+    })
+
+print(f"{bestandsnaam} → {setkaart}")
