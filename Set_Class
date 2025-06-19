@@ -21,4 +21,4 @@ class Set:
         return [color, symbol, shading, number]
 
     def __repr__(self):
-        return str(self.features)  
+        return str(self.features)    
