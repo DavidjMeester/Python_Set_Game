@@ -1,39 +1,56 @@
-
 import pygame
 import os
+import random
 
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
 
-selected1 = False   
-while running:
-    # poll for events
-    screen.fill((32, 111, 86))
+# 1. Lees alle .gif bestanden in de map
+kaart_pad = "kaarten"
+alle_gif_kaarten = [f for f in os.listdir(kaart_pad) if f.endswith(".gif")]
 
-    plaatje1 = pygame.image.load("kaarten/redovalshaded2.gif")
+# 2. Kies willekeurig 12 kaarten
+gekozen_kaarten = random.sample(alle_gif_kaarten, 12)
+
+# 3. Laad kaarten met posities en selectie-status
+kaarten = []
+for i, bestandsnaam in enumerate(gekozen_kaarten):
+    pad = os.path.join(kaart_pad, bestandsnaam)
+    afbeelding = pygame.image.load(pad)
     
-    plaatje1_rect = pygame.Rect(100,100,100,200)
-    screen.blit(plaatje1, (100,100))
-    plaatje2 = pygame.image.load("kaarten/greenovalshaded3.gif")
-    screen.blit(plaatje2, (220, 100))
-    # pygame.QUIT event means the user clicked X to close your window
+    x = 50 + (i % 4) * 150
+    y = 50 + (i // 4) * 215
+    rect = pygame.Rect(x, y, 100, 200)
+    kaarten.append({
+        "image": afbeelding,
+        "rect": rect,
+        "selected": False
+    })
+
+
+
+# --- Main loop ---
+while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if plaatje1_rect.collidepoint(event.pos):
-                selected1 = not selected1
-                
-    if selected1:
-        pygame.draw.rect(screen, (255, 0, 0), plaatje1_rect, 4)
-      
-    # RENDER YOUR GAME HERE
+            for kaart in kaarten:
+                if kaart["rect"].collidepoint(event.pos):
+                    kaart["selected"] = not kaart["selected"]
 
-    # flip() the display to put your work on screen
+    screen.fill((30, 100, 100))
+
+    # Teken alle kaarten
+    for kaart in kaarten:
+        screen.blit(kaart["image"], kaart["rect"].topleft)
+        if kaart["selected"]:
+            pygame.draw.rect(screen, (255, 0, 0), kaart["rect"], 4)
+
     pygame.display.flip()
-
-    clock.tick(60)  # limits FPS to 60
+    clock.tick(60)
 
 pygame.quit()
