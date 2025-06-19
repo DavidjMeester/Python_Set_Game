@@ -9,15 +9,15 @@ class Set:
         self.features = self.parse_name_to_features(self.name)
 
     def parse_name_to_features(self, name):
-        # Find color
-        color_idx = next(i for i, c in enumerate(self.colors) if c in name)
-        # Find symbol
-        symbol_idx = next(i for i, s in enumerate(self.symbols) if s in name)
-        # Find shading
-        shading_idx = next(i for i, sh in enumerate(self.shadings) if sh in name)
-        # Find number
+        #Find color
+        color = next(i for i, c in enumerate(self.colors) if c in name)
+        #Find symbol
+        symbol = next(i for i, s in enumerate(self.symbols) if s in name)
+        #Find shading
+        shading = next(i for i, sh in enumerate(self.shadings) if sh in name)
+        #Find number
         number_char = name[-1]
-        number_idx = int(number_char) - 1
+        number = int(number_char) - 1
         return [color_idx, symbol_idx, shading_idx, number_idx]
 
     def __repr__(self):
