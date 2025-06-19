@@ -76,6 +76,12 @@ screen = pygame.display.set_mode((1080, 720))
 clock = pygame.time.Clock()
 running = True
 
+#Font voor tijd, timer
+font = pygame.font.SysFont(None, 48)
+COUNTDOWN_SECONDS = 30
+endtime = pygame.time.get_ticks() + COUNTDOWN_SECONDS * 1000
+
+
 # 1. Lees alle .gif bestanden in de map
 kaart_pad = "kaarten"
 alle_gif_kaarten = [f for f in os.listdir(kaart_pad) if f.endswith(".gif")]
@@ -107,6 +113,11 @@ set_gevonden_kaarten = []
 ongeldige_set_kaarten = []
 
 while running:
+
+    #res tijd
+    remaining_ms = endtime - pygame.time.get_ticks()
+    remaining_seconds = max(0, remaining_ms // 1000)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -173,6 +184,9 @@ while running:
         ongeldige_set_timer = 0
 
     pygame.draw.line(screen, (255, 255, 255), (660, 0), (660, 720), 15)
+    
+    timer_text = font.render(f"Time left: {remaining_seconds}s", True, (255, 255, 255))
+    screen.blit(timer_text, (675, 20)) 
 
     pygame.display.flip()
     clock.tick(60)
