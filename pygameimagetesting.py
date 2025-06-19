@@ -50,6 +50,8 @@ while running:
         if kaart["selected"]:
             pygame.draw.rect(screen, (255, 0, 0), kaart["rect"], 4)
 
+    pygame.draw.line(screen, (255, 255, 255), (660, 0), (660, 720), 15)
+    
     pygame.display.flip()
     clock.tick(60)
 
