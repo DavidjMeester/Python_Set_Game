@@ -18,7 +18,7 @@ class Set:
         #Find number
         number_char = name[-1]
         number = int(number_char) - 1
-        return [color_idx, symbol_idx, shading_idx, number_idx]
+        return [color, symbol, shading, number]
 
     def __repr__(self):
-        return str(self.features)
+        return str(self.features)  
