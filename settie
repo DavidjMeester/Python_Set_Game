@@ -1,0 +1,195 @@
+import random
+import itertools
+import pygame
+import os
+import sys
+# kaartclassen
+class Card:
+    def __init__(self, number, symbol, color, shading):
+        self.attributes = (number, symbol, color, shading)
+    
+    def __str__(self):
+        symbollist = ["◆", "~", "◦"]
+        colorlist = ["red", "green", "purple"]
+        shadinglist = ["solid", "striped", "open"]
+        n, s, c, sh = self.attributes
+        return f"{n+1} {colorlist[c]} {shadinglist[sh]} {symbollist[s]}"
+
+    def to_tuple(self):
+        return self.attributes
+
+#functie voor als eht set is 
+def is_set(c1, c2, c3):
+    for i in range(4):
+        if (c1[i] + c2[i] + c3[i]) % 3 != 0:
+            return False
+    return True
+
+def find_one_set(cards):
+    tuples = [c.to_tuple() for c in cards]
+    card_lookup = set(tuples)
+    for i in range(len(cards)):
+        for j in range(i+1, len(cards)):
+            needed = tuple((- (tuples[i][x] + tuples[j][x]) % 3) for x in range(4))
+            if needed in card_lookup:
+                if needed != tuples[i] and needed != tuples[j]:
+                    return (cards[i], cards[j], Card(*needed))
+    return None
+
+# opbouw van het spelleke
+def generate_deck():
+    return [Card(*attrs) for attrs in itertools.product(range(3), repeat=4)]
+
+def draw_cards(deck, count):
+    drawn = random.sample(deck, count)
+    for c in drawn:
+        deck.remove(c)
+    return drawn
+
+# main game
+def main():
+    deck = generate_deck()
+    player_score = 0
+    computer_score = 0
+
+    table = draw_cards(deck, 12)
+
+    while True:
+        print("\n--- Tafelkaarten ---")
+        for idx, card in enumerate(table):
+            print(f"{idx+1}: {card}")
+
+        found_set = find_one_set(table)
+        if not found_set:
+            print("Geen SET op tafel! 3 nieuwe kaarten worden toegevoegd.")
+            if len(deck) < 3:
+                print("Deck is op. Spel voorbij.")
+                break
+            table += draw_cards(deck, 3)
+            continue
+
+        # keuze van de speler
+        try:
+            user_input = input("\nKies 3 kaarten als SET (bijv. 1 5 9), of 'stop' om te stoppen: ")
+            if user_input.strip().lower() == "stop":
+                break
+            indices = list(map(int, user_input.strip().split()))
+            if len(indices) != 3:
+                print("Je moet precies 3 getallen geven.")
+                continue
+            cards = [table[i-1] for i in indices]
+        except:
+            print("Ongeldige invoer.")
+            continue
+
+        if is_set(*[c.to_tuple() for c in cards]):
+            print("✅ Correcte SET!")
+            player_score += 1
+            # Verwijder kaarten en vul aan
+            for c in cards:
+                table.remove(c)
+            if len(deck) >= 3:
+                table += draw_cards(deck, 3)
+        else:
+            print("❌ Geen geldige SET. De computer krijgt een punt.")
+            computer_score += 1
+
+        print(f"Scores - Jij: {player_score}, Computer: {computer_score}")
+
+        if len(deck) == 0 and not find_one_set(table):
+            print("Geen kaarten meer en geen SETs meer. Einde spel.")
+            break
+
+    print(f"\nEindscore - Jij: {player_score}, Computer: {computer_score}")
+
+if __name__ == "__main__":
+    main()
+
+
+
+# set up
+pygame.init()
+WIDTH, HEIGHT = 1000, 600
+WHITE = (255, 255, 255)
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("SET Game - Stap 2")
+font = pygame.font.SysFont(None, 36)
+
+# --- Card class ---
+class Card:
+    def __init__(self, number, symbol, color, shading):
+        self.attributes = (number, symbol, color, shading)
+        filename = f"{number}_{symbol}_{color}_{shading}.png"
+        self.image = pygame.image.load(os.path.join("kaarten", filename))
+        self.image = pygame.transform.scale(self.image, (100, 150))
+
+    def draw(self, surface, pos):
+        surface.blit(self.image, pos)
+
+    def to_tuple(self):
+        return self.attributes
+
+# --- Deck functies ---
+def generate_deck():
+    return [Card(*attrs) for attrs in itertools.product(range(3), repeat=4)]
+
+def draw_cards(deck, count):
+    drawn = random.sample(deck, count)
+    for c in drawn:
+        deck.remove(c)
+    return drawn
+
+# --- Hoofdgame ---
+def main():
+    deck = generate_deck()
+    table = draw_cards(deck, 12)
+    selected = []
+    player_score = 0
+
+    running = True
+    while running:
+        screen.fill(WHITE)
+
+        # Teken kaarten in grid
+        positions = []
+        for idx, card in enumerate(table):
+            x = 50 + (idx % 6) * 150
+            y = 50 + (idx // 6) * 200
+            card.draw(screen, (x, y))
+            positions.append((pygame.Rect(x, y, 100, 150), card))
+
+        # Tekst
+        score_text = font.render(f"Score: {player_score}", True, (0, 0, 0))
+        screen.blit(score_text, (800, 20))
+
+        pygame.display.flip()
+
+        # Events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                for idx, (rect, card) in enumerate(positions):
+                    if rect.collidepoint(pos):
+                        if card not in selected:
+                            selected.append(card)
+                            if len(selected) == 3:
+                                # Check SET
+                                if is_set(*[c.to_tuple() for c in selected]):
+                                    player_score += 1
+                                    print("✅ Geldige SET!")
+                                    for c in selected:
+                                        table.remove(c)
+                                    if len(deck) >= 3:
+                                        table += draw_cards(deck, 3)
+                                else:
+                                    print("❌ Geen geldige SET!")
+                                selected = []
+
+    pygame.quit()
+    sys.exit()
+
+if __name__ == "__main__":
+    main()
