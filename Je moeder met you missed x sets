@@ -91,8 +91,7 @@ for i, bestandsnaam in enumerate(gekozen_kaarten):
         "rect": rect,
         "selected": False,
         "vector": tuple(Set(bestandsnaam.replace(".gif", "")).features),
-        "is_valid_set": None
-    })
+        "is_valid_set": None})
 
 #definieer voor de loopjes en functies
 set_timer = 0
@@ -112,16 +111,15 @@ def toon_startscherm():
         "Welcome to SET!",
         "",
         "The rules:",
-        "- on the screen, you'll see 12 cards.",
+        "- On the screen, you'll see 12 cards.",
         "- Each card has 4 properties:",
-        "  color, shape, shading and numbers.",
-        "- A set consist of 3 cards where all properties are:",
+        "  color, shape, shading and number.",
+        "- A set consist of 3 cards whose properties are:",
         "  either the same, or different for all 4 properties.",
         "",
-        "Click on 3 cards to check if its a set.",
+        "Click on 3 cards to check if they form a set.",
         "",
-       
-    ]
+        "Good Luck!"]
 
     #loop
     while True:
@@ -151,20 +149,20 @@ def toon_startscherm():
         knop_rect_exp = pygame.Rect(730, 385, 300, 70)
     
     #knoppen moeilijkheids
-        pygame.draw.rect(screen, knop_kleur_beg, knop_rect_beg, border_radius=10)
-        pygame.draw.rect(screen, knop_kleur_int, knop_rect_int, border_radius=10)
-        pygame.draw.rect(screen, knop_kleur_exp, knop_rect_exp, border_radius=10)
+        pygame.draw.rect(screen, knop_kleur_beg, knop_rect_beg, border_radius = 10)
+        pygame.draw.rect(screen, knop_kleur_int, knop_rect_int, border_radius = 10)
+        pygame.draw.rect(screen, knop_kleur_exp, knop_rect_exp, border_radius = 10)
 
     #kleur aanpassen van de geselecteerde (0,0,0) is nog zwart maar misschien andere kleur?
         if geselecteerde_moeilijkheid == 40:
             knop_kleur_beg = (0, 0, 0)  
-        pygame.draw.rect(screen, knop_kleur_beg, knop_rect_beg, border_radius=12)
+        pygame.draw.rect(screen, knop_kleur_beg, knop_rect_beg, border_radius = 12)
         if geselecteerde_moeilijkheid == 30:
             knop_kleur_int = (0,0,0)  
-        pygame.draw.rect(screen, knop_kleur_int, knop_rect_int, border_radius=12)
+        pygame.draw.rect(screen, knop_kleur_int, knop_rect_int, border_radius = 12)
         if geselecteerde_moeilijkheid == 20:
             knop_kleur_exp = (0,0,0) 
-        pygame.draw.rect(screen, knop_kleur_exp, knop_rect_exp, border_radius=12)
+        pygame.draw.rect(screen, knop_kleur_exp, knop_rect_exp, border_radius = 12)
             
     #het echte startscherm
         for event in pygame.event.get():
@@ -302,6 +300,7 @@ while running:
                 for k in geselecteerd:
                     k["is_valid_set"] = is_geldig
                 if is_geldig:
+                    set_door_player = True
                     speler_score += 1
                     set_timer = pygame.time.get_ticks() + 500
                     set_gevonden_kaarten = geselecteerd.copy()
@@ -320,7 +319,11 @@ while running:
         if kaart["selected"]:
             if kaart["is_valid_set"] is True:
                 kleur = (0, 255, 0)
-                surfacegoed = pygame.image.load(os.path.join("goeie set foto.jpg"))
+                if set_door_player == True:
+                    surfacegoed = pygame.image.load(os.path.join("goeie set foto.jpg"))
+                else: 
+                    surfacegoed = pygame.image.load(os.path.join("computer set goed.webp"))
+                    surfacegoed = pygame.transform.scale(surfacegoed, (200, 355))
                 screen.blit(surfacegoed, (725, 300))
             elif kaart["is_valid_set"] is False:
                 kleur = (255, 0, 0)
@@ -349,8 +352,12 @@ while running:
         show_gemiste_sets_start = pygame.time.get_ticks()
         show_gemiste_sets_end = show_gemiste_sets_start + 1000 
         if gevonden_set:
+            set_door_player = False
             computer_score += 1
-            gemiste_sets = f"You missed {len(find_all_sets(huidige_vectors))} SETS!"
+            if len(find_all_sets(huidige_vectors)) == 1:
+                gemiste_sets = "You missed 1 SET!"
+            else:
+                gemiste_sets = f"You missed {len(find_all_sets(huidige_vectors))} SETS!"
             set_kaarten = [k for k in kaarten if k["vector"] in gevonden_set]
             for kaart in kaarten:
                 kaart["selected"] = kaart in set_kaarten
@@ -385,8 +392,7 @@ while running:
                 "rect": rect,
                 "selected": False,
                 "vector": tuple(Set(bestandsnaam.replace(".gif", "")).features),
-                "is_valid_set": None
-            })
+                "is_valid_set": None})
         speler_score = 0
         computer_score = 0
         endtime = pygame.time.get_ticks() + COUNTDOWN_SECONDS * 1000
