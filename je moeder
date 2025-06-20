@@ -262,7 +262,6 @@ def toon_eindscherm(speler_score, computer_score, huidige_tijd_per_beurt):
         pygame.time.Clock().tick(60)
 
 #van deze volgorgde klopt echt nog niks!!
-toon_startscherm()
 
 #dit is voor het spel zelf
 font = pygame.font.SysFont(None, 48)
