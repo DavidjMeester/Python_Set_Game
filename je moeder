@@ -207,8 +207,13 @@ def toon_eindscherm(speler_score, computer_score, huidige_tijd_per_beurt):
     font_groot = pygame.font.SysFont(None, 64)
     font_klein = pygame.font.SysFont(None, 36)
 
-    winnaar = "Speler wins!" if speler_score > computer_score else (
-              "Tie!" if speler_score == computer_score else "Computer wins!")
+
+    if speler_score > computer_score:
+            winnaar = "You win!" 
+    if speler_score < computer_score:
+            winnaar = "Computer wins!"
+    else:
+        winnaar = "Tie!"
 
     while True:
         screen.fill((0, 30, 60))
@@ -228,6 +233,7 @@ def toon_eindscherm(speler_score, computer_score, huidige_tijd_per_beurt):
         # Titel & winnaar
         text_winnaar = font_groot.render("Game over!", True, (255, 255, 255))
         screen.blit(text_winnaar, (screen.get_width() // 2 - text_winnaar.get_width() // 2, 80))
+        
 
         uitslag = font_klein.render(winnaar, True, (255, 255, 255))
         screen.blit(uitslag, (screen.get_width() // 2 - uitslag.get_width() // 2, 160))
