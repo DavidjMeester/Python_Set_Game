@@ -217,7 +217,7 @@ def toon_eindscherm(speler_score, computer_score, huidige_tijd_per_beurt):
     #wie er wint
     if speler_score > computer_score:
             winnaar = "You win!" 
-    if speler_score < computer_score:
+    elif speler_score < computer_score:
             winnaar = "Computer wins!"
     else:
         winnaar = "Tie!"
@@ -347,6 +347,7 @@ while running:
 
 #als de tijd op is moet de computer kijken hoe die een set kan vinden met find_one_set en dan nieuwe kaarten 
     if remaining_seconds == 0:
+        geselecteerd = []
         huidige_vectors = [k["vector"] for k in kaarten if "vector" in k]
         gevonden_set = find_one_set(huidige_vectors)
         show_gemiste_sets_start = pygame.time.get_ticks()
