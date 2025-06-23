@@ -1,3 +1,4 @@
+
 import os
 import random
 import pygame
@@ -281,7 +282,9 @@ endtime = pygame.time.get_ticks() + COUNTDOWN_SECONDS * 1000
 while running:
     #timer
     remaining_ms = endtime - pygame.time.get_ticks()
-    remaining_seconds = max(0, remaining_ms // 1000)
+    if remaining_ms > 0:
+        remaining_seconds = round(remaining_ms / 1000, None)
+    else: remaining_ms = None
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -346,7 +349,7 @@ while running:
         ongeldige_set_timer = 0
 
 #als de tijd op is moet de computer kijken hoe die een set kan vinden met find_one_set en dan nieuwe kaarten 
-    if remaining_seconds == 0:
+    if remaining_ms == None:
         geselecteerd = []
         huidige_vectors = [k["vector"] for k in kaarten if "vector" in k]
         gevonden_set = find_one_set(huidige_vectors)
@@ -415,5 +418,3 @@ while running:
     clock.tick(60)
 
 pygame.quit()
-
-
