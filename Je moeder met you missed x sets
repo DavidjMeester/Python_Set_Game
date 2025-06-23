@@ -50,7 +50,7 @@ def find_all_sets(cards):
         for x in range(i + 1, len(cards) - 1):
             m = missing_card(cards[i], cards[x])
             if m in cards_set:
-                SET = (cards[i],cards[x],m)
+                SET = tuple(sorted((cards[i],cards[x],m)))
                 sets.add(SET)
     return sets
 
@@ -160,7 +160,7 @@ def toon_startscherm():
         if geselecteerde_moeilijkheid == 30:
             knop_kleur_int = (0,0,0)  
         pygame.draw.rect(screen, knop_kleur_int, knop_rect_int, border_radius = 12)
-        if geselecteerde_moeilijkheid == 20:
+        if geselecteerde_moeilijkheid == 3:
             knop_kleur_exp = (0,0,0) 
         pygame.draw.rect(screen, knop_kleur_exp, knop_rect_exp, border_radius = 12)
             
@@ -177,7 +177,7 @@ def toon_startscherm():
                 if knop_rect_int.collidepoint(event.pos):
                     geselecteerde_moeilijkheid = 30
                 if knop_rect_exp.collidepoint(event.pos):
-                    geselecteerde_moeilijkheid = 20
+                    geselecteerde_moeilijkheid = 3
                 if knop_rect_start.collidepoint(event.pos) and geselecteerde_moeilijkheid is not None:
                     return geselecteerde_moeilijkheid
        
@@ -351,7 +351,7 @@ while running:
         huidige_vectors = [k["vector"] for k in kaarten if "vector" in k]
         gevonden_set = find_one_set(huidige_vectors)
         show_gemiste_sets_start = pygame.time.get_ticks()
-        show_gemiste_sets_end = show_gemiste_sets_start + 1000 
+        show_gemiste_sets_end = show_gemiste_sets_start + 1300
         if gevonden_set:
             set_door_player = False
             computer_score += 1
@@ -363,7 +363,7 @@ while running:
             for kaart in kaarten:
                 kaart["selected"] = kaart in set_kaarten
                 kaart["is_valid_set"] = kaart in set_kaarten
-            set_timer = pygame.time.get_ticks() + 1000
+            set_timer = pygame.time.get_ticks() + 1300
             set_gevonden_kaarten = set_kaarten.copy()
         # geen mogelijke set optie
         else:
