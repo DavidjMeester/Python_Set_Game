@@ -160,7 +160,7 @@ def toon_startscherm():
         if geselecteerde_moeilijkheid == 30:
             knop_kleur_int = (0,0,0)  
         pygame.draw.rect(screen, knop_kleur_int, knop_rect_int, border_radius = 12)
-        if geselecteerde_moeilijkheid == 3:
+        if geselecteerde_moeilijkheid == 20:
             knop_kleur_exp = (0,0,0) 
         pygame.draw.rect(screen, knop_kleur_exp, knop_rect_exp, border_radius = 12)
             
@@ -177,7 +177,7 @@ def toon_startscherm():
                 if knop_rect_int.collidepoint(event.pos):
                     geselecteerde_moeilijkheid = 30
                 if knop_rect_exp.collidepoint(event.pos):
-                    geselecteerde_moeilijkheid = 3
+                    geselecteerde_moeilijkheid = 20
                 if knop_rect_start.collidepoint(event.pos) and geselecteerde_moeilijkheid is not None:
                     return geselecteerde_moeilijkheid
        
