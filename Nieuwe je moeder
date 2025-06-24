@@ -53,18 +53,19 @@ def find_all_sets(cards):
                 sets.add(SET)
     return sets
 
-def vervang_kaarten(geselecteerde_kaarten, kaarten, overgebleven_kaarten, kaart_pad):
-    for kaart in geselecteerde_kaarten:
-        if overgebleven_kaarten:
-            nieuwe_bestandsnaam = random.choice(overgebleven_kaarten)
-            overgebleven_kaarten.remove(nieuwe_bestandsnaam)
-            pad = os.path.join(kaart_pad, nieuwe_bestandsnaam)
-            kaart["image"] = pygame.image.load(pad)
-            kaart["selected"] = False
-            kaart["is_valid_set"] = None
-            kaart["vector"] = tuple(Set(nieuwe_bestandsnaam.replace(".gif", "")).features)
+def replace_cards(selected_cards, cards, remaining_cards, card_pad):
+    for card in selected_cards:
+        if remaining_cards:
+            new_file_name = random.choice(remaining_cards)
+            remaining_cards.remove(new_file_name)
+            pad = os.path.join(card_pad, new_file_name)
+            card["image"] = pygame.image.load(pad)
+            card["selected"] = False
+            card["is_valid_set"] = None
+            card["vector"] = tuple(Set(new_file_name.replace(".gif", "")).features)
         else:
-            kaarten.remove(kaart)
+            cards.remove(card)
+
 
 #begin van pygame
 pygame.init()
@@ -73,39 +74,39 @@ clock = pygame.time.Clock()
 running = True
 
 #definities zodat we de kaarten kunnen zien 
-kaart_pad = "kaarten"
-alle_gif_kaarten = [f for f in os.listdir(kaart_pad) if f.endswith(".gif")]
-gekozen_kaarten = random.sample(alle_gif_kaarten, 12)
-overgebleven_kaarten = [f for f in alle_gif_kaarten if f not in gekozen_kaarten]
+card_pad = "kaarten"
+all_cards = [f for f in os.listdir(card_pad) if f.endswith(".gif")]
+picked_cards = random.sample(all_cards, 12)
+remaining_cards = [f for f in all_cards if f not in picked_cards]
 
-kaarten = []
-for i, bestandsnaam in enumerate(gekozen_kaarten):
-    pad = os.path.join(kaart_pad, bestandsnaam)
-    afbeelding = pygame.image.load(pad)
+cards = []
+for i, filename in enumerate(picked_cards):
+    pad = os.path.join(card_pad, filename)
+    img = pygame.image.load(pad)
     x = 50 + (i % 4) * 150
     y = 50 + (i // 4) * 215
     rect = pygame.Rect(x, y, 100, 200)
-    kaarten.append({
-        "image": afbeelding,
+    cards.append({
+        "image": img,
         "rect": rect,
         "selected": False,
-        "vector": tuple(Set(bestandsnaam.replace(".gif", "")).features),
+        "vector": tuple(Set(filename.replace(".gif", "")).features),
         "is_valid_set": None})
 
 #definieer voor de loopjes en functies
 set_timer = 0
-ongeldige_set_timer = 0
-set_gevonden_kaarten = []
-ongeldige_set_kaarten = []
-speler_score = 0
+false_set_timer = 0
+found_set_cards = []
+false_set_cards = []
+player_score = 0
 computer_score = 0
 
 
 # Startscherm
-def toon_startscherm():
-    geselecteerde_moeilijkheid = None
-    #tekst uitleg
-    uitleg = [
+def show_startscreen():
+    selected_difficulty = None
+    #text uitleg
+    explanation = [
         "Welcome to SET!",
         "",
         "The rules:",
@@ -123,44 +124,44 @@ def toon_startscherm():
     while True:
         screen.fill((180, 211, 178))
 
-    #technische shit om die tekst en kelur te kunnen doen
+    #technische shit om die text en kelur te kunnen doen
         title_font = pygame.font.SysFont(None, 60)
-        uitleg_font = pygame.font.SysFont(None, 30)
+        explanation_font = pygame.font.SysFont(None, 30)
 
-    # eigenschap van de startknop
-        knop_rect_start = pygame.Rect(440, 590, 200, 60)
-        knop_kleur = (70, 200, 70)
-        tekst_kleur = (255, 255, 255)
+    # eigenschap van de startF
+        start_button_rect = pygame.Rect(440, 590, 200, 60)
+        start_button_color = (70, 200, 70)
+        text_color = (255, 255, 255)
 
-        for i, regel in enumerate(uitleg):
-            tekst = uitleg_font.render(regel, True, (255, 255, 255))
-            screen.blit(tekst, (100, 150 + i * 30))
+        for i, line in enumerate(explanation):
+            text = explanation_font.render(line, True, (255, 255, 255))
+            screen.blit(text, (100, 150 + i * 30))
 
     #eigenschappen moeilijkheidsknoppen
-        knop_kleur_beg = (255, 255, 0)
-        knop_rect_beg = pygame.Rect(730, 185, 300, 70)
+        dif_button_color_beg = (255, 255, 0)
+        dif_button_rect_beg = pygame.Rect(730, 185, 300, 70)
 
-        knop_kleur_int = (255, 165, 0)
-        knop_rect_int = pygame.Rect(730, 285, 300, 70)
+        dif_button_color_int = (255, 165, 0)
+        dif_button_rect_int = pygame.Rect(730, 285, 300, 70)
 
-        knop_kleur_exp = (255, 0, 0)
-        knop_rect_exp = pygame.Rect(730, 385, 300, 70)
+        dif_button_color_exp = (255, 0, 0)
+        dif_button_rect_exp = pygame.Rect(730, 385, 300, 70)
     
     #knoppen moeilijkheids
-        pygame.draw.rect(screen, knop_kleur_beg, knop_rect_beg, border_radius = 10)
-        pygame.draw.rect(screen, knop_kleur_int, knop_rect_int, border_radius = 10)
-        pygame.draw.rect(screen, knop_kleur_exp, knop_rect_exp, border_radius = 10)
+        pygame.draw.rect(screen, dif_button_color_beg, dif_button_rect_beg, border_radius = 10)
+        pygame.draw.rect(screen, dif_button_color_int, dif_button_rect_int, border_radius = 10)
+        pygame.draw.rect(screen, dif_button_color_exp, dif_button_rect_exp, border_radius = 10)
 
     #kleur aanpassen van de geselecteerde (0,0,0) is nog zwart maar misschien andere kleur?
-        if geselecteerde_moeilijkheid == 40:
-            knop_kleur_beg = knop_kleur  
-        pygame.draw.rect(screen, knop_kleur_beg, knop_rect_beg, border_radius = 10)
-        if geselecteerde_moeilijkheid == 30:
-            knop_kleur_int = knop_kleur
-        pygame.draw.rect(screen, knop_kleur_int, knop_rect_int, border_radius = 10)
-        if geselecteerde_moeilijkheid == 3:
-            knop_kleur_exp = knop_kleur
-        pygame.draw.rect(screen, knop_kleur_exp, knop_rect_exp, border_radius = 10)
+        if selected_difficulty == 40:
+            dif_button_color_beg = start_button_color  
+        pygame.draw.rect(screen, dif_button_color_beg, dif_button_rect_beg, border_radius = 10)
+        if selected_difficulty == 30:
+            dif_button_color_int = start_button_color
+        pygame.draw.rect(screen, dif_button_color_int, dif_button_rect_int, border_radius = 10)
+        if selected_difficulty == 3:
+            dif_button_color_exp = start_button_color
+        pygame.draw.rect(screen, dif_button_color_exp, dif_button_rect_exp, border_radius = 10)
             
     #het echte startscherm
         for event in pygame.event.get():
@@ -170,55 +171,55 @@ def toon_startscherm():
 
             #het tikken van de knoppen
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if knop_rect_beg.collidepoint(event.pos):
-                    geselecteerde_moeilijkheid = 40
-                if knop_rect_int.collidepoint(event.pos):
-                    geselecteerde_moeilijkheid = 30
-                if knop_rect_exp.collidepoint(event.pos):
-                    geselecteerde_moeilijkheid = 3
-                if knop_rect_start.collidepoint(event.pos) and geselecteerde_moeilijkheid is not None:
-                    return geselecteerde_moeilijkheid
+                if dif_button_rect_beg.collidepoint(event.pos):
+                    selected_difficulty = 40
+                if dif_button_rect_int.collidepoint(event.pos):
+                    selected_difficulty = 30
+                if dif_button_rect_exp.collidepoint(event.pos):
+                    selected_difficulty = 3
+                if start_button_rect.collidepoint(event.pos) and selected_difficulty is not None:
+                    return selected_difficulty
        
        #start knop komt pas als je een moeilijkheidsknop hebt getikt
-        if geselecteerde_moeilijkheid is not None:
-            pygame.draw.rect(screen, knop_kleur, knop_rect_start, border_radius=10)
-            knop_tekst = title_font.render("Start Set", True, tekst_kleur)
-            screen.blit(knop_tekst, (450, 600))    
+        if selected_difficulty is not None:
+            pygame.draw.rect(screen, start_button_color, start_button_rect, border_radius=10)
+            button_text = title_font.render("Start Set", True, text_color)
+            screen.blit(button_text, (450, 600))    
             
         # Titel op scherm 
-        titel = title_font.render("SET - The Game", True, (255, 255, 255))
-        screen.blit(titel, (screen.get_width() // 2 - titel.get_width() // 2, 40))
+        title = title_font.render("SET - The Game", True, (255, 255, 255))
+        screen.blit(title, (screen.get_width() // 2 - title.get_width() // 2, 40))
         
-        # Tekst moeilijkheidsgraads
-        knop_tekst_beg = title_font.render("Beginner", True, tekst_kleur)
-        screen.blit(knop_tekst_beg, (750,200))
+        # text moeilijkheidsgraads
+        button_text_beg = title_font.render("Beginner", True, text_color)
+        screen.blit(button_text_beg, (750,200))
 
-        knop_tekst_int = title_font.render("Intermediate", True, tekst_kleur)
-        screen.blit(knop_tekst_int, (750, 300))
+        button_text_int = title_font.render("Intermediate", True, text_color)
+        screen.blit(button_text_int, (750, 300))
 
-        knop_tekst_exp = title_font.render("Expert", True, tekst_kleur)
-        screen.blit(knop_tekst_exp, (750, 400))
+        button_text_exp = title_font.render("Expert", True, text_color)
+        screen.blit(button_text_exp, (750, 400))
               
         pygame.display.flip()
         pygame.time.Clock().tick(60)
 
 
 #eindscherm
-def toon_eindscherm(speler_score, computer_score, huidige_tijd_per_beurt):
-    knop_opnieuw = pygame.Rect(400, 400, 280, 60)
-    knop_change_difficulty = pygame.Rect(400, 480, 280, 60)
-    knop_quit = pygame.Rect(400, 560, 280, 60)
+def show_endscreen(player_score, computer_score, time_per_turn):
+    button_play_again = pygame.Rect(400, 400, 280, 60)
+    button_change_difficulty = pygame.Rect(400, 480, 280, 60)
+    button_quit = pygame.Rect(400, 560, 280, 60)
 
-    font_groot = pygame.font.SysFont(None, 64)
-    font_klein = pygame.font.SysFont(None, 36)
+    font_large = pygame.font.SysFont(None, 64)
+    font_small = pygame.font.SysFont(None, 36)
 
     #wie er wint
-    if speler_score > computer_score:
-        winnaar = "You win!" 
-    elif speler_score < computer_score:
-        winnaar = "Computer wins!"
+    if player_score > computer_score:
+        winner = "You win!" 
+    elif player_score < computer_score:
+        winner = "Computer wins!"
     else:
-        winnaar = "Tie!"
+        winner = "Tie!"
 
     #als je het scherm hebt-loop
     while True:
@@ -229,44 +230,44 @@ def toon_eindscherm(speler_score, computer_score, huidige_tijd_per_beurt):
                 pygame.quit()
                 exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if knop_opnieuw.collidepoint(event.pos):
-                    return huidige_tijd_per_beurt  #Start opnieuw met huidge tijd
-                elif knop_change_difficulty.collidepoint(event.pos):
-                    COUNTDOWN_SECONDS = toon_startscherm()
+                if button_play_again.collidepoint(event.pos):
+                    return time_per_turn  #Start opnieuw met huidge tijd
+                elif button_change_difficulty.collidepoint(event.pos):
+                    COUNTDOWN_SECONDS = show_startscreen()
                     return COUNTDOWN_SECONDS
-                elif knop_quit.collidepoint(event.pos):
+                elif button_quit.collidepoint(event.pos):
                     pygame.quit()
                     exit()
 
 
         #Titel & winnaar
-        text_winnaar = font_groot.render("Game over!", True, (255, 255, 255))
-        screen.blit(text_winnaar, (screen.get_width() // 2 - text_winnaar.get_width() // 2, 80))
+        text_game_over = font_large.render("Game over!", True, (255, 255, 255))
+        screen.blit(text_game_over, (screen.get_width() // 2 - text_game_over.get_width() // 2, 80))
         
-        uitslag = font_klein.render(winnaar, True, (255, 255, 255))
-        screen.blit(uitslag, (screen.get_width() // 2 - uitslag.get_width() // 2, 160))
+        winner_text = font_small.render(winner, True, (255, 255, 255))
+        screen.blit(winner_text, (screen.get_width() // 2 - winner_text.get_width() // 2, 160))
 
-        score_text = font_klein.render(f"Player: {speler_score}    Computer: {computer_score}", True, (255, 255, 255))
+        score_text = font_small.render(f"Player: {player_score}    Computer: {computer_score}", True, (255, 255, 255))
         screen.blit(score_text, (screen.get_width() // 2 - score_text.get_width() // 2, 220))
 
 
 
         # Knoppen tekenen
-        pygame.draw.rect(screen, (0, 180, 0), knop_opnieuw, border_radius = 10)
-        pygame.draw.rect(screen, (255, 165, 0), knop_change_difficulty, border_radius = 10)
-        pygame.draw.rect(screen, (180, 0, 0), knop_quit, border_radius = 10)
+        pygame.draw.rect(screen, (0, 180, 0), button_play_again, border_radius = 10)
+        pygame.draw.rect(screen, (255, 165, 0), button_change_difficulty, border_radius = 10)
+        pygame.draw.rect(screen, (180, 0, 0), button_quit, border_radius = 10)
 
-        opnieuw_text = font_klein.render("Play Again", True, (255, 255, 255))
-        screen.blit(opnieuw_text, (knop_opnieuw.centerx - opnieuw_text.get_width() // 2,
-                                   knop_opnieuw.centery - opnieuw_text.get_height() // 2))
+        play_again_text = font_small.render("Play Again", True, (255, 255, 255))
+        screen.blit(play_again_text, (button_play_again.centerx - play_again_text.get_width() // 2,
+                                   button_play_again.centery - play_again_text.get_height() // 2))
 
-        minder_text = font_klein.render("Change Difficulty", True, (255, 255, 255))
-        screen.blit(minder_text, (knop_change_difficulty.centerx - minder_text.get_width() // 2,
-                                  knop_change_difficulty.centery - minder_text.get_height() // 2))
+        change_difficulty_text = font_small.render("Change Difficulty", True, (255, 255, 255))
+        screen.blit(change_difficulty_text, (button_change_difficulty.centerx - change_difficulty_text.get_width() // 2,
+                                  button_change_difficulty.centery - change_difficulty_text.get_height() // 2))
 
-        meer_text = font_klein.render("Quit", True, (255, 255, 255))
-        screen.blit(meer_text, (knop_quit.centerx - meer_text.get_width() // 2,
-                                knop_quit.centery - meer_text.get_height() // 2))
+        quit_text = font_small.render("Quit", True, (255, 255, 255))
+        screen.blit(quit_text, (button_quit.centerx - quit_text.get_width() // 2,
+                                button_quit.centery - quit_text.get_height() // 2))
 
         pygame.display.flip()
         pygame.time.Clock().tick(60)
@@ -275,7 +276,7 @@ def toon_eindscherm(speler_score, computer_score, huidige_tijd_per_beurt):
 
 #dit is voor het spel zelf
 font = pygame.font.SysFont(None, 48)
-COUNTDOWN_SECONDS = toon_startscherm()
+COUNTDOWN_SECONDS = show_startscreen()
 endtime = pygame.time.get_ticks() + COUNTDOWN_SECONDS * 1000
 
 while running:
@@ -291,105 +292,123 @@ while running:
         #kaarten tikken en zodra je 3 hebt geselecteerd functie aanroepen en score updaten maar wel nog zonder die highlight ronde 
         #erom heen en ook nog niet het plaatje
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            for kaart in kaarten:
-                if kaart["rect"].collidepoint(event.pos):
-                    kaart["selected"] = not kaart["selected"]
+            for card in cards:
+                if card["rect"].collidepoint(event.pos):
+                    card["selected"] = not card["selected"]
 
-            geselecteerd = [k for k in kaarten if k["selected"]]
-            if len(geselecteerd) == 3:
-                vectors = [k["vector"] for k in geselecteerd]
-                is_geldig = is_set(*vectors)
-                for k in geselecteerd:
-                    k["is_valid_set"] = is_geldig
-                if is_geldig:
-                    set_door_player = True
-                    speler_score += 1
+            selected_cards = [k for k in cards if k["selected"]]
+            if len(selected_cards) == 3:
+                vectors = [k["vector"] for k in selected_cards]
+                is_valid = is_set(*vectors)
+                for k in selected_cards:
+                    k["is_valid_set"] = is_valid
+                if is_valid:
+                    set_by_player = True
+                    player_score += 1
                     set_timer = pygame.time.get_ticks() + 500
-                    set_gevonden_kaarten = geselecteerd.copy()
+                    found_set_cards = selected_cards.copy()
                     endtime = pygame.time.get_ticks() + COUNTDOWN_SECONDS * 1000
                 else:
-                    ongeldige_set_timer = pygame.time.get_ticks() + 500
-                    ongeldige_set_kaarten = geselecteerd.copy()
+                    false_set_timer = pygame.time.get_ticks() + 500
+                    false_set_cards = selected_cards.copy()
             else:
-                for k in kaarten:
+                for k in cards:
                     k["is_valid_set"] = None
 
     screen.fill((30, 100, 100))
 
-    for kaart in kaarten:
-        screen.blit(kaart["image"], kaart["rect"].topleft)
-        if kaart["selected"]:
-            if kaart["is_valid_set"] is True:
-                kleur = (0, 255, 0)
-                if set_door_player == True:
-                    surfacegoed = pygame.image.load(os.path.join("goeie set foto.jpg"))
+    for card in cards:
+        screen.blit(card["image"], card["rect"].topleft)
+        if card["selected"]:
+            if card["is_valid_set"] is True:
+                color = (0, 255, 0)
+                if set_by_player == True:
+                    surface_correct = pygame.image.load(os.path.join("goeie set foto.jpg"))
                 else: 
-                    surfacegoed = pygame.image.load(os.path.join("computer set goed.webp"))
-                    surfacegoed = pygame.transform.scale(surfacegoed, (200, 355))
-                screen.blit(surfacegoed, (725, 300))
-            elif kaart["is_valid_set"] is False:
-                kleur = (255, 0, 0)
+                    surface_correct = pygame.image.load(os.path.join("computer set goed.webp"))
+                    surface_correct = pygame.transform.scale(surface_correct, (200, 355))
+                screen.blit(surface_correct, (725, 300))
+            elif card["is_valid_set"] is False:
+                color = (255, 0, 0)
                 surfacefout = pygame.image.load(os.path.join("foute set foto.jpg"))
                 screen.blit(surfacefout, (725, 300))
             else:
-                kleur = (255, 255, 0)
-            pygame.draw.rect(screen, kleur, kaart["rect"], 4)
+                color = (255, 255, 0)
+            pygame.draw.rect(screen, color, card["rect"], 4)
 
     if set_timer and pygame.time.get_ticks() >= set_timer:
-        vervang_kaarten(set_gevonden_kaarten, kaarten, overgebleven_kaarten, kaart_pad)
-        set_gevonden_kaarten.clear()
+        replace_cards(found_set_cards, cards, remaining_cards, card_pad)
+        found_set_cards.clear()
         set_timer = 0
 
-    if ongeldige_set_timer and pygame.time.get_ticks() >= ongeldige_set_timer:
-        for kaart in ongeldige_set_kaarten:
-            kaart["selected"] = False
-            kaart["is_valid_set"] = None
-        ongeldige_set_kaarten.clear()
-        ongeldige_set_timer = 0
+    if false_set_timer and pygame.time.get_ticks() >= false_set_timer:
+        for card in false_set_cards:
+            card["selected"] = False
+            card["is_valid_set"] = None
+        false_set_cards.clear()
+        false_set_timer = 0
 
 #als de tijd op is moet de computer kijken hoe die een set kan vinden met find_one_set en dan nieuwe kaarten 
     if remaining_ms == None:
-        geselecteerd = []
-        huidige_vectors = [k["vector"] for k in kaarten if "vector" in k]
-        gevonden_set = find_one_set(huidige_vectors)
-        show_gemiste_sets_start = pygame.time.get_ticks()
-        show_gemiste_sets_end = show_gemiste_sets_start + 1300
-        if gevonden_set:
-            set_door_player = False
+        selected_cards = []
+        current_vectors = [k["vector"] for k in cards if "vector" in k]
+        found_set = find_one_set(current_vectors)
+        show_missed_sets_start = pygame.time.get_ticks()
+        show_missed_sets_end = show_missed_sets_start + 1300
+        if found_set:
+            set_by_player = False
             computer_score += 1
-            if len(find_all_sets(huidige_vectors)) == 1:
-                gemiste_sets = "You missed 1 SET!"
+            if len(find_all_sets(current_vectors)) == 1:
+                missed_sets = "You missed 1 SET!"
             else:
-                gemiste_sets = f"You missed {len(find_all_sets(huidige_vectors))} SETS!"
-            set_kaarten = [k for k in kaarten if k["vector"] in gevonden_set]
-            for kaart in kaarten:
-                kaart["selected"] = kaart in set_kaarten
-                kaart["is_valid_set"] = kaart in set_kaarten
+                missed_sets = f"You missed {len(find_all_sets(current_vectors))} SETS!"
+            set_cards = [k for k in cards if k["vector"] in found_set]
+            for card in cards:
+                card["selected"] = card in set_cards
+                card["is_valid_set"] = card in set_cards
             set_timer = pygame.time.get_ticks() + 1300
-            set_gevonden_kaarten = set_kaarten.copy()
+            found_set_cards = set_cards.copy()
         # geen mogelijke set optie
         else:
-            te_vervangen_kaarten = [kaarten[i] for i in [0, 4, 8] if i < len(kaarten)]
-            gemiste_sets = "There were no SETS!"
-            vervang_kaarten(te_vervangen_kaarten, kaarten, overgebleven_kaarten, kaart_pad)
-        gemiste_sets_text = font.render(gemiste_sets, True, (255, 255, 255))  
+            cards_to_be_replaced = [cards[i] for i in [0, 4, 8] if i < len(cards)]
+            missed_sets = "There were no SETS!"
+            replace_cards(cards_to_be_replaced, cards, remaining_cards, card_pad)
+        missed_sets_text = font.render(missed_sets, True, (255, 255, 255))  
         endtime = pygame.time.get_ticks() + COUNTDOWN_SECONDS * 1000
 
-        # Spel is klaar als er geen sets meer zijn en geen overgebleven_kaarten
-    huidige_vectors = [k["vector"] for k in kaarten]
-    if not find_one_set(huidige_vectors) and not overgebleven_kaarten:
-        COUNTDOWN_SECONDS = toon_eindscherm(speler_score, computer_score, COUNTDOWN_SECONDS)
+        # Spel is klaar als er geen sets meer zijn en geen remaining_cards
+    current_vectors = [k["vector"] for k in cards]
+    if not find_one_set(current_vectors) and not remaining_cards:
+        COUNTDOWN_SECONDS = show_endscreen(player_score, computer_score, COUNTDOWN_SECONDS)
+        picked_cards = random.sample(all_cards, 12)
+        remaining_cards = [f for f in all_cards if f not in picked_cards]
+        cards.clear()
+        for i, filename in enumerate(picked_cards):
+            pad = os.path.join(card_pad, filename)
+            img = pygame.image.load(pad)
+            x = 50 + (i % 4) * 150
+            y = 50 + (i // 4) * 215
+            rect = pygame.Rect(x, y, 100, 200)
+            cards.append({
+                "image": img,
+                "rect": rect,
+                "selected": False,
+                "vector": tuple(Set(filename.replace(".gif", "")).features),
+                "is_valid_set": None})
+        player_score = 0
+        computer_score = 0
+        endtime = pygame.time.get_ticks() + COUNTDOWN_SECONDS * 1000
 
-#tekst aan de zijkant, rechts
+#text aan de zijkant, rechts
     pygame.draw.line(screen, (255, 255, 255), (660, 0), (660, 720), 15)
     timer_text = font.render(f"Time left: {remaining_seconds}s", True, (255, 255, 255))
     screen.blit(timer_text, (675, 20))
-    score_text = font.render(f"You: {speler_score}  |  Computer: {computer_score}", True, (255, 255, 255))
+    score_text = font.render(f"You: {player_score}  |  Computer: {computer_score}", True, (255, 255, 255))
     screen.blit(score_text, (675, 70))
-    pot_text = font.render(f"Cards left: {len(overgebleven_kaarten)}", True, (255, 255, 255))
+    pot_text = font.render(f"Cards left: {len(remaining_cards)}", True, (255, 255, 255))
     screen.blit(pot_text, (675, 120))
-    if 'show_gemiste_sets_end' in locals() and pygame.time.get_ticks() < show_gemiste_sets_end:
-        screen.blit(gemiste_sets_text, (675, 200))
+    if 'show_missed_sets_end' in locals() and pygame.time.get_ticks() < show_missed_sets_end:
+        screen.blit(missed_sets_text, (675, 200))
 
 
     pygame.display.flip()
