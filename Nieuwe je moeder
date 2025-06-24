@@ -380,27 +380,6 @@ while running:
     if not find_one_set(huidige_vectors) and not overgebleven_kaarten:
         COUNTDOWN_SECONDS = toon_eindscherm(speler_score, computer_score, COUNTDOWN_SECONDS)
 
-    #uhhhh waarvoor is deze nog? zijn die nog voor het laden van de kaarten?
-        gekozen_kaarten = random.sample(alle_gif_kaarten, 12)
-        overgebleven_kaarten = [f for f in alle_gif_kaarten if f not in gekozen_kaarten]
-        kaarten.clear()
-        for i, bestandsnaam in enumerate(gekozen_kaarten):
-            pad = os.path.join(kaart_pad, bestandsnaam)
-            afbeelding = pygame.image.load(pad)
-            x = 50 + (i % 4) * 150
-            y = 50 + (i // 4) * 215
-            rect = pygame.Rect(x, y, 100, 200)
-            kaarten.append({
-                "image": afbeelding,
-                "rect": rect,
-                "selected": False,
-                "vector": tuple(Set(bestandsnaam.replace(".gif", "")).features),
-                "is_valid_set": None})
-        speler_score = 0
-        computer_score = 0
-        endtime = pygame.time.get_ticks() + COUNTDOWN_SECONDS * 1000
-
-
 #tekst aan de zijkant, rechts
     pygame.draw.line(screen, (255, 255, 255), (660, 0), (660, 720), 15)
     timer_text = font.render(f"Time left: {remaining_seconds}s", True, (255, 255, 255))
