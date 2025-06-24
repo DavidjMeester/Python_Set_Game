@@ -5,22 +5,20 @@ import pygame
 
 # De eigenschappen opsplitsen
 class Set:
-    colors = ['red', 'green', 'purple']
-    symbols = ['oval', 'squiggle', 'diamond']
-    shadings = ['filled', 'shaded', 'empty']
-    numbers = ['1', '2', '3']
+    colors = ('red', 'green', 'purple')
+    symbols = ('oval', 'squiggle', 'diamond')
+    shadings = ('filled', 'shaded', 'empty')
 
     def __init__(self, name):
-        self.name = name.lower()
+        self.name = name
         self.features = self.parse_name_to_features(self.name)
 
     def parse_name_to_features(self, name):
         color = next(i for i, c in enumerate(self.colors) if c in name)
         symbol = next(i for i, s in enumerate(self.symbols) if s in name)
         shading = next(i for i, sh in enumerate(self.shadings) if sh in name)
-        number_char = name[-1]
-        number = int(number_char) - 1
-        return [color, symbol, shading, number]
+        number = int(name[-1]) - 1
+        return (color, symbol, shading, number)
 
     def __repr__(self):
         return str(self.features)
@@ -216,9 +214,9 @@ def toon_eindscherm(speler_score, computer_score, huidige_tijd_per_beurt):
 
     #wie er wint
     if speler_score > computer_score:
-            winnaar = "You win!" 
+        winnaar = "You win!" 
     elif speler_score < computer_score:
-            winnaar = "Computer wins!"
+        winnaar = "Computer wins!"
     else:
         winnaar = "Tie!"
 
@@ -234,7 +232,8 @@ def toon_eindscherm(speler_score, computer_score, huidige_tijd_per_beurt):
                 if knop_opnieuw.collidepoint(event.pos):
                     return huidige_tijd_per_beurt  #Start opnieuw met huidge tijd
                 elif knop_change_difficulty.collidepoint(event.pos):
-                    toon_startscherm()
+                    COUNTDOWN_SECONDS = toon_startscherm()
+                    return COUNTDOWN_SECONDS
                 elif knop_quit.collidepoint(event.pos):
                     pygame.quit()
                     exit()
@@ -254,7 +253,7 @@ def toon_eindscherm(speler_score, computer_score, huidige_tijd_per_beurt):
 
         # Knoppen tekenen
         pygame.draw.rect(screen, (0, 180, 0), knop_opnieuw, border_radius = 10)
-        pygame.draw.rect(screen, (0, 0, 180), knop_change_difficulty, border_radius = 10)
+        pygame.draw.rect(screen, (255, 165, 0), knop_change_difficulty, border_radius = 10)
         pygame.draw.rect(screen, (180, 0, 0), knop_quit, border_radius = 10)
 
         opnieuw_text = font_klein.render("Play Again", True, (255, 255, 255))
