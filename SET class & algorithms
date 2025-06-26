@@ -1,0 +1,48 @@
+class Set:
+    colors = ('red', 'green', 'purple')
+    symbols = ('oval', 'squiggle', 'diamond')
+    shadings = ('filled', 'shaded', 'empty')
+
+    def __init__(self, name):
+        self.name = name
+        self.features = self.parse_name_to_features(self.name)
+
+    def parse_name_to_features(self, name):
+        color = next(i for i, c in enumerate(self.colors) if c in name)
+        symbol = next(i for i, s in enumerate(self.symbols) if s in name)
+        shading = next(i for i, sh in enumerate(self.shadings) if sh in name)
+        number = int(name[-1]) - 1
+        return (color, symbol, shading, number)
+
+    def __repr__(self):
+        return str(self.features)
+
+def is_set(card1,card2,card3):
+        for x in range(4):
+            totalvalue = card1[x] + card2[x] + card3[x]
+            if totalvalue % 3 != 0:
+                return False
+        return True
+
+def find_one_set(cards):
+    cards_set = set(cards)
+    def missing_card(c1, c2):
+        return tuple((- (c1[x] + c2[x]) % 3) for x in range(4))
+    for i in range(len(cards) - 2):
+        for x in range(i + 1, len(cards) - 1):
+            m = missing_card(cards[i], cards[x])
+            if m in cards_set:
+                return (cards[i], cards[x], m)
+
+def find_all_sets(cards):
+    cards_set = set(cards) 
+    sets = set()
+    def missing_card(c1, c2):
+        return tuple((- (c1[x] + c2[x]) % 3) for x in range(4))
+    for i in range(len(cards) - 2):
+        for x in range(i + 1, len(cards) - 1):
+            m = missing_card(cards[i], cards[x])
+            if m in cards_set:
+                SET = tuple(sorted((cards[i],cards[x],m)))
+                sets.add(SET)
+    return sets
